@@ -479,6 +479,29 @@ uint32_t shim::arc4random() {
     return u;
 }
 
+int shim::fwscanf(bionic::FILE* fp, const wchar_t* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    int ret = vfwscanf(fp->wrapped, fmt, args);
+    va_end(args);
+    update_feof(fp);
+    return ret;
+}
+
+int shim::vfwscanf(bionic::FILE* fp, const wchar_t* fmt, va_list va) {
+    int ret = vfwscanf(fp->wrapped, fmt, va);
+    update_feof(fp);
+    return ret;
+}
+
+int shim::fwprintf(bionic::FILE* fp, const wchar_t* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    int ret = vfwprintf(fp->wrapped, fmt, args);
+    va_end(args);
+    return ret;
+}
+
 void shim::add_common_shimmed_symbols(std::vector<shim::shimmed_symbol> &list) {
     list.insert(list.end(), {
         {"__errno", bionic::get_errno},
@@ -949,16 +972,16 @@ void shim::add_wchar_shimmed_symbols(std::vector<shim::shimmed_symbol> &list) {
         {"fwide", AutoArgRewritten(::fwide)},
 #if LIBC_SHIM_DEFINE_VARIADIC
         {"wscanf", ::wscanf},
-        {"fwscanf", ::fwscanf},
+        {"fwscanf", fwscanf},
         {"swscanf", ::swscanf},
         {"vwscanf", ::vwscanf},
-        {"vfwscanf", ::vfwscanf},
+        {"vfwscanf", vfwscanf},
         {"vswscanf", ::vswscanf},
         {"wprintf", ::wprintf},
-        {"fwprintf", ::fwprintf},
+        {"fwprintf", fwprintf},
         {"swprintf", ::swprintf},
         {"vwprintf", ::vwprintf},
-        {"vfwprintf", ::vfwprintf},
+        {"vfwprintf", AutoArgRewritten(::vfwprintf)},
         {"vswprintf", ::vswprintf},
 #endif
         {"wcscoll_l", ::wcscoll_l},

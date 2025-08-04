@@ -62,6 +62,8 @@ namespace shim {
 
         size_t strlcpy(char *dst, const char *src, size_t siz);
 
+        struct FILE;
+
     }
 
     int gettid();
@@ -153,6 +155,12 @@ namespace shim {
     void arc4random_buf(void* buf, size_t len);
 
     uint32_t arc4random();
+
+    int fwscanf(bionic::FILE* fp, const wchar_t* fmt, ...);
+
+    int vfwscanf(bionic::FILE* fp, const wchar_t* fmt, va_list va);
+
+    int fwprintf(bionic::FILE* fp, const wchar_t* fmt, ...);
 
     int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
 
