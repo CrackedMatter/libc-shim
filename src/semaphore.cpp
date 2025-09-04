@@ -55,6 +55,10 @@ int shim::sem_wait(host_sem_t *sem) {
     return semaphore_wait(*sem);
 }
 
+int shim::sem_trywait(host_sem_t *sem) {
+    return semaphore_wait_noblock(*sem);
+}
+
 int shim::sem_post(host_sem_t *sem) {
     return semaphore_signal(*sem);
 }
@@ -93,6 +97,7 @@ void shim::add_sem_shimmed_symbols(std::vector<shim::shimmed_symbol> &list) {
         {"sem_init", sem_init},
         {"sem_destroy", sem_destroy},
         {"sem_wait", &detail::arg_rewrite_helper<int (::sem_t *)>::rewrite<sem_wait>},
+        {"sem_trywait", &detail::arg_rewrite_helper<int (::sem_t *)>::rewrite<sem_trywait>},
         {"sem_timedwait", &detail::arg_rewrite_helper<int (::sem_t *, const struct timespec *)>::rewrite<sem_timedwait>},
         {"sem_post", &detail::arg_rewrite_helper<int (::sem_t *)>::rewrite<sem_post>},
     });
